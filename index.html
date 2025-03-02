@@ -3,103 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
+    <title>Are You Charles' Best Friend?</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sacramento&display=swap');
+
+        /* Animated Heart Background */
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #222;
-            margin: 0;
+            font-family: 'Sacramento', cursive;
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            overflow: hidden;
+            position: relative;
         }
-        canvas {
-            background-color: #000;
-            border: 2px solid #fff;
+
+        /* Heart Animation */
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: red;
+            clip-path: polygon(50% 0%, 100% 35%, 80% 100%, 50% 80%, 20% 100%, 0% 35%);
+            animation: float 5s infinite ease-in-out;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-50px) scale(1.2); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0.6; }
+        }
+
+        /* Creating Multiple Hearts */
+        .heart:nth-child(1) { left: 10%; animation-duration: 4s; }
+        .heart:nth-child(2) { left: 30%; animation-duration: 6s; }
+        .heart:nth-child(3) { left: 50%; animation-duration: 5s; }
+        .heart:nth-child(4) { left: 70%; animation-duration: 7s; }
+        .heart:nth-child(5) { left: 90%; animation-duration: 6s; }
+
+        /* Question Box */
+        .container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #ff4d6d;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.3);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-family: 'Sacramento', cursive;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        .yes-btn {
+            background-color: #28a745;
+        }
+
+        .no-btn {
+            background-color: #dc3545;
+        }
+
+        .video-container {
+            margin-top: 20px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 400px;
+            display: none;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
 
-        const box = 20;
-        let snake = [{ x: 10 * box, y: 10 * box }];
-        let direction = "RIGHT";
-        let food = {
-            x: Math.floor(Math.random() * 20) * box,
-            y: Math.floor(Math.random() * 20) * box
-        };
+    <!-- Floating Hearts for Animation -->
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
 
-        document.addEventListener("keydown", changeDirection);
-        
-        function changeDirection(event) {
-            const key = event.key;
-            if (key === "ArrowUp" && direction !== "DOWN") direction = "UP";
-            else if (key === "ArrowDown" && direction !== "UP") direction = "DOWN";
-            else if (key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
-            else if (key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = "red";
-            ctx.fillRect(food.x, food.y, box, box);
-
-            ctx.fillStyle = "green";
-            snake.forEach((segment, index) => {
-                ctx.fillRect(segment.x, segment.y, box, box);
-                ctx.strokeStyle = "black";
-                ctx.strokeRect(segment.x, segment.y, box, box);
-            });
-
-            let head = { x: snake[0].x, y: snake[0].y };
-            if (direction === "UP") head.y -= box;
-            else if (direction === "DOWN") head.y += box;
-            else if (direction === "LEFT") head.x -= box;
-            else if (direction === "RIGHT") head.x += box;
-
-            if (head.x === food.x && head.y === food.y) {
-                food = {
-                    x: Math.floor(Math.random() * 20) * box,
-                    y: Math.floor(Math.random() * 20) * box
-                };
-            } else {
-                snake.pop();
-            }
-
-            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-                alert("Game Over!");
-                document.location.reload();
-            }
-
-            snake.unshift(head);
-        }
-
-        setInterval(draw, 150);
-
-        const controls = {
-            up: document.getElementById("up"),
-            down: document.getElementById("down"),
-            left: document.getElementById("left"),
-            right: document.getElementById("right")
-        };
-
-        controls.up.addEventListener("click", () => changeDirection({ key: "ArrowUp" }));
-        controls.down.addEventListener("click", () => changeDirection({ key: "ArrowDown" }));
-        controls.left.addEventListener("click", () => changeDirection({ key: "ArrowLeft" }));
-        controls.right.addEventListener("click", () => changeDirection({ key: "ArrowRight" }));
-    </script>
-    <div style="position: absolute; bottom: 20px; display: flex; flex-direction: column; align-items: center;">
-        <button id="up">▲</button>
-        <div>
-            <button id="left">◀</button>
-            <button id="down">▼</button>
-            <button id="right">▶</button>
+    <div class="container">
+        <h1>ARE YOU CHARLES' BEST FRIEND? ❤️</h1>
+        <div class="buttons">
+            <button class="yes-btn" onclick="playVideo('yes')">Yes</button>
+            <button class="no-btn" onclick="playVideo('no')">No</button>
+        </div>
+        <div class="video-container">
+            <video id="yesVideo" controls>
+                <source src="https://www.mediafire.com/file/c1vgezonunyop9t/1740927543326.mp4/file" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <video id="noVideo" controls>
+                <source src="https://www.mediafire.com/file/gjrmeth6cnra8ta/1740927631124.mp4/file" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
         </div>
     </div>
+
+    <script>
+        function playVideo(choice) {
+            var yesVideo = document.getElementById("yesVideo");
+            var noVideo = document.getElementById("noVideo");
+
+            // Pause and hide both videos first
+            yesVideo.pause();
+            yesVideo.style.display = "none";
+            noVideo.pause();
+            noVideo.style.display = "none";
+
+            // Show and play the selected video
+            if (choice === 'yes') {
+                yesVideo.style.display = "block";
+                yesVideo.play();
+            } else {
+                noVideo.style.display = "block";
+                noVideo.play();
+            }
+        }
+    </script>
+
 </body>
-    </html>
+</html>
